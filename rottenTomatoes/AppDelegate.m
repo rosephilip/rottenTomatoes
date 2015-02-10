@@ -7,17 +7,66 @@
 //
 
 #import "AppDelegate.h"
+#import "MoviesViewController.h"
+#import "SVProgressHUD.h"
 
 @interface AppDelegate ()
+
+- (void)startLoading:(MoviesViewController*)vc;
+- (void)loadInBackground:(MoviesViewController*)vc;
+- (void)finishedLoading:(MoviesViewController*)vc;
+- (void)showErr:(MoviesViewController*)vc;
 
 @end
 
 @implementation AppDelegate
 
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Override point for customization after application launch.
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    
+    MoviesViewController *vc = [[MoviesViewController alloc] init];
+    
+    [self.window makeKeyAndVisible];
+
+    [self startLoading:vc];
     return YES;
+}
+
+- (void) startLoading:(MoviesViewController*)vc {
+    [SVProgressHUD showWithStatus:@"Loading.."];
+    [self performSelectorInBackground:@selector(loadInBackground:) withObject:vc];
+}
+
+- (void) loadInBackground:(MoviesViewController*)vc {
+    NSURL *url = [NSURL URLWithString:@"http://api.rottentomatoes.com/api/public/v1.0/lists/movies/box_office.json?apikey=vy7dgqjrfyqrq39jfp7er2vv&limit=20&country=us"];
+    NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url];
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+        if (connectionError != nil) {
+            [SVProgressHUD dismiss];
+            [self performSelectorOnMainThread:@selector(showErr:) withObject:vc waitUntilDone:NO];
+            return;
+        }
+        NSDictionary *responseDictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+        
+        vc.movies = responseDictionary[@"movies"];
+        [SVProgressHUD dismiss];
+        [self performSelectorOnMainThread:@selector(finishedLoading:) withObject:vc waitUntilDone:NO];
+
+    }];
+    }
+
+- (void) showErr:(MoviesViewController*)vc {
+    vc.networkErr = YES;
+    UINavigationController *nvc = [[UINavigationController alloc] initWithRootViewController:vc];
+    self.window.rootViewController = nvc;
+    [self.window makeKeyAndVisible];
+}
+
+- (void)finishedLoading:(MoviesViewController*)vc {
+    vc.networkErr = NO;
+    UINavigationController *nvc = [[UINavigationController alloc] initWithRootViewController:vc];
+    self.window.rootViewController = nvc;
+    [self.window makeKeyAndVisible];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {

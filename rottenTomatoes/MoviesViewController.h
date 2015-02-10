@@ -8,6 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
-@interface MoviesViewController : UIViewController
+@interface MoviesViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate>
+
+@property (nonatomic, strong) NSMutableArray *movies;
+@property (nonatomic, strong) NSMutableArray *filteredMovies;
+@property (weak, nonatomic) IBOutlet UIView *errorView;
+@property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
+@property (nonatomic, assign) BOOL networkErr;
+@property BOOL isFiltered;
 
 @end

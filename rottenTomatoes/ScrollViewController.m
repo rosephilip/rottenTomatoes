@@ -7,6 +7,7 @@
 //
 
 #import "ScrollViewController.h"
+#import "UIImageView+AFNetworking.h"
 
 @interface ScrollViewController ()
 
@@ -17,6 +18,18 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    
+    self.titleLabel.text = self.movie[@"title"];
+    self.synopsisLabel.text = self.movie[@"synopsis"];
+    self.scrollView.contentSize = CGSizeMake(320, 1000);
+    
+   /* NSLog(@"HERE");
+    NSDictionary *dic = self.movie[@"posters"];
+    NSString *str = dic[@"thumbnail"];
+    NSLog(@"%@",str);*/
+    NSString *posterURL = [self.movie valueForKeyPath:@"posters.thumbnail"];
+    NSLog(@"%@",posterURL);
+    [self.posterView setImageWithURL:[NSURL URLWithString:posterURL]];
 }
 
 - (void)didReceiveMemoryWarning {

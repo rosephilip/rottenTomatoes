@@ -9,5 +9,10 @@
 #import <UIKit/UIKit.h>
 
 @interface ScrollViewController : UIViewController
+@property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
+@property (weak, nonatomic) IBOutlet UILabel *titleLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *posterView;
+@property (weak, nonatomic) IBOutlet UILabel *synopsisLabel;
+@property (nonatomic, strong) NSDictionary *movie;
 
 @end
